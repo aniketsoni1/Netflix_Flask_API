@@ -1,0 +1,6 @@
+
+venv/lib/python3.8/site-packages/pip/_vendor/cachecontrol/__pycache__/filewrapper.cpython-38.pyc
+*.pyc
+/venv/
+/.idea/
+config.ini
