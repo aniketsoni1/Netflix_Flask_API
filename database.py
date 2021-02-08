@@ -8,9 +8,12 @@ class ShowsData:
     def __init__(self):
         self.db = ShowsDBCRUD()
 
-    def view_all_shows(self):
+    def view_all_shows(self, args):
         print('view_all_shows database.py')
-        data = self.db.view_all_shows()
+        limit = args.get('limit')
+        offset = args.get('offset')
+        sort_by = args.get('sortBy')
+        data = self.db.view_all_shows(limit, offset, sort_by)
         data = jsonify(data)
         print('here', data)
         return data

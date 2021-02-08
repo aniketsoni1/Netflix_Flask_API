@@ -15,10 +15,10 @@ class ShowsDBCRUD:
     def __init__(self):
         self.con = psycopg2.connect(database=DATABASE, user=USER, password=PASSWORD, host=HOST, port=PORT)
 
-    def view_all_shows(self):
+    def view_all_shows(self, limit, offset, sort_by):
         print('view_all_shows crud.py')
         cur = self.con.cursor()
-        cur.execute("""
+        cur.execute(f"""
             SELECT
                 s.title,
                 s.director,
@@ -26,7 +26,9 @@ class ShowsDBCRUD:
                 s.release_year,
                 s.country
             FROM shows s
-            LIMIT 2;
+            ORDER BY s.release_year {sort_by}
+            LIMIT {limit}
+            OFFSET {offset};
             """)
         rows = cur.fetchall()
         return rows
@@ -91,32 +93,43 @@ class ShowsDBCRUD:
 
     def update_show_type(self, show_type, show_id):
         print('update_show_type crud.py')
-        cur = self.con.cursor()
-        cur.execute(f"""
-            UPDATE shows
-            SET type = '{show_type}'
-            WHERE show_id = {show_id};
-            """)
-        self.con.commit()
+        try:
+            cur = self.con.cursor()
+            cur.execute(f"""
+                UPDATE shows
+                SET type = '{show_type}'
+                WHERE show_id = {show_id};
+                """)
+            self.con.commit()
+        except:
+            self.con.rollback()
+            print("already modified..")
 
     def delete_show_by_id(self, show_id):
         print('delete_show_by_id crud.py')
-        cur = self.con.cursor()
-        cur.execute(f"""
-            DELETE FROM shows
-            WHERE show_id = {show_id};
-            """)
-        self.con.commit()
-
+        try:
+            cur = self.con.cursor()
+            cur.execute(f"""
+                DELETE FROM shows
+                WHERE show_id = {show_id};
+                """)
+            self.con.commit()
+        except:
+            self.con.rollback()
+            print("already deleted..")
 
     def insert_show(self, show_id, type, title, director, cast, country,
                     date_added, release_year, rating, duration, listed_in, description):
         print('insert_show crud.py')
-        cur = self.con.cursor()
-        cur.execute(f"""
-            INSERT INTO shows (show_id, type, title, director, "cast", country,
-             date_added, release_year, rating, duration, listed_in, description)
-            VALUES ('{show_id}', '{type}', '{title}', '{director}', '{cast}', '{country}',
-             '{date_added}', {release_year}, '{rating}', '{duration}', '{listed_in}', '{description}');
-            """)
-        self.con.commit()
+        try:
+            cur = self.con.cursor()
+            cur.execute(f"""
+                INSERT INTO shows (show_id, type, title, director, "cast", country,
+                 date_added, release_year, rating, duration, listed_in, description)
+                VALUES ('{show_id}', '{type}', '{title}', '{director}', '{cast}', '{country}',
+                 '{date_added}', {release_year}, '{rating}', '{duration}', '{listed_in}', '{description}');
+                """)
+            self.con.commit()
+        except:
+            self.con.rollback()
+            print("already exists..")

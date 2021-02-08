@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 from database import ShowsData
 
 app = Flask(__name__)
@@ -12,8 +12,13 @@ def index():
 
 @app.route('/viewAllShows', methods=['GET'])
 def view_all_shows():
+    args = request.args
+    acceptable_args = {"offset", "limit", "sortBy"}
+    for k, v in args.items():
+        if k not in acceptable_args:
+            return 'bad request!', 400
     print('view_all_shows app.py')
-    data = database.view_all_shows()
+    data = database.view_all_shows(args)
     return data
 
 
